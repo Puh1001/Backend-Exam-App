@@ -28,47 +28,67 @@ const getUserController = async (req, res) => {
 };
 
 const registerUserController = async (req, res) => {
+  const conn = await db.getConnection();
+
   try {
-    const { user_id, username, password, email, fullname, phone, role } =
-      req.body;
-    if (
-      !user_id ||
-      !username ||
-      !password ||
-      !email ||
-      !fullname ||
-      !phone ||
-      !role
-    ) {
+    await conn.beginTransaction();
+
+    const { username, password, email } = req.body;
+    if (!username || !password || !email) {
       return res.status(400).send({
         success: false,
-        message: "Please Provide all fields",
+        message: "Please provide all required fields",
       });
     }
 
     // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const data = await db.query(
-      "INSERT INTO `users`(`user_id`, `username`, `password`, `email`, `fullname`, `phone`, `role`) VALUES (?,?,?,?,?,?,?)",
-      [user_id, username, hashedPassword, email, fullname, phone, role]
+    // Insert new user
+    const [userResult] = await conn.query(
+      "INSERT INTO `users` (`username`, `password`, `email`, `is_active`) VALUES (?, ?, ?, TRUE)",
+      [username, hashedPassword, email]
     );
-    if (!data) {
-      return res.status(500).send({
-        success: false,
-        message: "Error in INSERT QUERY",
-      });
+
+    if (!userResult.insertId) {
+      throw new Error("Failed to insert new user");
     }
+
+    const newUserId = userResult.insertId;
+
+    // Get default role
+    const [roles] = await conn.query(
+      "SELECT `role_id` FROM `roles` WHERE `is_default` = TRUE LIMIT 1"
+    );
+
+    if (roles.length === 0) {
+      throw new Error("No default role found");
+    }
+
+    const defaultRoleId = roles[0].role_id;
+
+    // Assign default role to new user
+    await conn.query(
+      "INSERT INTO `user_roles` (`user_id`, `role_id`) VALUES (?, ?)",
+      [newUserId, defaultRoleId]
+    );
+
+    await conn.commit();
+
     res.status(201).send({
       success: true,
-      message: "New User Record Created",
+      message: "New user registered successfully",
     });
   } catch (error) {
+    await conn.rollback();
+    console.error("Error in register user:", error);
     res.status(500).send({
       success: false,
-      message: "Error in register user",
-      error,
+      message: "Error in registering user",
+      error: error.message,
     });
+  } finally {
+    conn.release();
   }
 };
 
