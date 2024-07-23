@@ -103,17 +103,19 @@ const loginUserController = asyncHandler(async (req, res) => {
   }
 
   const userQuery = "SELECT * FROM `users` WHERE `username` = ?";
-  const userResult = await db.query(userQuery, [username]);
+  const [rows] = await db.execute(userQuery, [username]);
+  console.log("Number of users found:", rows);
 
-  if (userResult.length === 0) {
+  if (rows.length === 0) {
     return res.status(404).json({
       success: false,
       message: "User not found",
     });
   }
-
-  const findUser = userResult[0];
+  const findUser = userResult[1];
+  console.log(userResult[1]);
   const matchPassword = findUser[0].password;
+  console.log(matchPassword);
   if (!matchPassword) {
     return res.status(500).json({
       success: false,
