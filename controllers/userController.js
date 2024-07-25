@@ -1,6 +1,10 @@
 const asyncHandler = require("express-async-handler");
 const db = require("../configs/db");
 const userService = require("../services/userService");
+const {
+  UserNotFoundError,
+  InvalidCredentialsError,
+} = require("../services/userService");
 
 const getUserController = asyncHandler(async (req, res) => {
   const [data] = await db.query("SELECT * FROM `users`");
@@ -98,18 +102,18 @@ const loginUserController = asyncHandler(async (req, res) => {
     } catch (loginError) {
       await conn.rollback();
 
-      if (loginError.message === "User not found") {
+      if (loginError instanceof UserNotFoundError) {
         return res.status(404).json({
           success: false,
-          message: "User not found",
+          message: loginError.message,
         });
-      } else if (loginError.message === "Invalid credentials") {
+      } else if (loginError instanceof InvalidCredentialsError) {
         return res.status(401).json({
           success: false,
-          message: "Invalid password",
+          message: loginError.message,
         });
       } else {
-        throw loginError; // Rethrow unexpected errors
+        throw loginError;
       }
     }
   } catch (error) {

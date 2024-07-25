@@ -23,17 +23,31 @@ const registerUser = async (conn, username, password, email) => {
   await userModel.assignRoleToUser(conn, newUserId, defaultRoleId);
 };
 
+class UserNotFoundError extends Error {
+  constructor(message = "User not found") {
+    super(message);
+    this.name = "UserNotFoundError";
+  }
+}
+
+class InvalidCredentialsError extends Error {
+  constructor(message = "Invalid credentials") {
+    super(message);
+    this.name = "InvalidCredentialsError";
+  }
+}
+
 const loginUser = async (conn, username, password) => {
   const user = await userModel.findUserByUsername(username);
 
   if (!user) {
-    throw new Error("User not found");
+    throw new UserNotFoundError();
   }
 
   const validPassword = await comparePassword(password, user.password);
 
   if (!validPassword) {
-    throw new Error("Invalid credentials");
+    throw new InvalidCredentialsError();
   }
 
   const accessToken = generateToken(user.user_id);
@@ -60,4 +74,6 @@ module.exports = {
   registerUser,
   loginUser,
   refreshUserToken,
+  UserNotFoundError,
+  InvalidCredentialsError,
 };
