@@ -15,4 +15,7 @@ router.post("/registerUser", registerUserController);
 // Login
 router.post("/login", loginUserController);
 
+//  Refesh Token Controller
+router.post("/refresh-token", registerUserController);
+
 module.exports = router;

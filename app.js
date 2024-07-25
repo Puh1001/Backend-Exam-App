@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 require("dotenv").config();
+const cors = require("cors");
 
 const connection = require("./configs/db");
 
@@ -11,9 +12,10 @@ const domain = process.env.DOMAIN;
 const port = process.env.PORT || 8000;
 
 // MIDDLEWARES
+app.use(cors());
+app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(express.json());
 
