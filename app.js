@@ -12,7 +12,12 @@ const domain = process.env.DOMAIN;
 const port = process.env.PORT || 8000;
 
 // MIDDLEWARES
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FE_URI,
+    credentials: true,
+  })
+);
 app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
