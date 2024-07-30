@@ -8,6 +8,20 @@ const findUserByUsername = async (username) => {
   return rows[0];
 };
 
+const findUSerById = async (userId) => {
+  try {
+    console.log(userId);
+    const [rows] = await db.execute(
+      "SELECT user_id, username, email, fullname, phone FROM users WHERE user_id = ?",
+      [userId]
+    );
+    return rows[0];
+  } catch (error) {
+    console.error("Error in getUserById model:", error);
+    throw error;
+  }
+};
+
 const createUser = async (conn, username, hashedPassword, email) => {
   const [userResult] = await conn.query(
     "INSERT INTO `users` (`username`, `password`, `email`, `is_active`) VALUES (?, ?, ?, TRUE)",
@@ -43,4 +57,5 @@ module.exports = {
   getDefaultRole,
   assignRoleToUser,
   updateUserRefreshToken,
+  findUSerById,
 };

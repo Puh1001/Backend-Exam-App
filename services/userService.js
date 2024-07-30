@@ -70,10 +70,19 @@ const refreshUserToken = async (refreshToken) => {
   return newAccessToken;
 };
 
+const getUserDataById = async (userId) => {
+  const user = await userModel.findUSerById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+  return user;
+};
+
 module.exports = {
   registerUser,
   loginUser,
   refreshUserToken,
+  getUserDataById,
   UserNotFoundError,
   InvalidCredentialsError,
 };

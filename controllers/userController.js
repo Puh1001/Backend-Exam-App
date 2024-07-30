@@ -159,9 +159,34 @@ const refreshTokenController = asyncHandler(async (req, res) => {
   }
 });
 
+const getUserDataByIdController = asyncHandler(async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId);
+  try {
+    const userData = await userService.getUserDataById(userId);
+    res.status(200).json({
+      success: true,
+      data: userData,
+    });
+  } catch (error) {
+    if (error.message === "User not found") {
+      res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: "Error retrieving user data",
+      });
+    }
+  }
+});
+
 module.exports = {
   getUserController,
   registerUserController,
   loginUserController,
   refreshTokenController,
+  getUserDataByIdController,
 };
