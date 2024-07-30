@@ -75,14 +75,14 @@ const loginUserController = asyncHandler(async (req, res) => {
       await conn.commit();
 
       res.cookie("accessToken", accessToken, {
-        httpOnly: true,
+        // httpOnly: true,
         maxAge: 15 * 60 * 1000,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
       });
 
       res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
+        // httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
@@ -141,7 +141,7 @@ const refreshTokenController = asyncHandler(async (req, res) => {
     const newAccessToken = await userService.refreshUserToken(refreshToken);
 
     res.cookie("accessToken", newAccessToken, {
-      httpOnly: true,
+      // httpOnly: true,
       maxAge: 15 * 60 * 1000,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
