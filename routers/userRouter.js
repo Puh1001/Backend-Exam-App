@@ -9,7 +9,7 @@ const { auth } = require("../middlewares/auth");
 
 const router = express.Router();
 // test
-router.get("/getUsers", auth, getUserController);
+router.get("/getUsers", getUserController);
 
 // Register
 router.post("/registerUser", registerUserController);

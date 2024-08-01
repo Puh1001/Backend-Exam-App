@@ -46,7 +46,11 @@ const registerUserController = asyncHandler(async (req, res) => {
     });
   } catch (error) {
     await conn.rollback();
-    throw error;
+    res.status(500).json({
+      success: false,
+      message: "Error in register user!!",
+    });
+    console.log(error);
   } finally {
     conn.release();
   }
@@ -161,7 +165,6 @@ const refreshTokenController = asyncHandler(async (req, res) => {
 
 const getUserDataByIdController = asyncHandler(async (req, res) => {
   const userId = req.params.id;
-  console.log(userId);
   try {
     const userData = await userService.getUserDataById(userId);
     res.status(200).json({

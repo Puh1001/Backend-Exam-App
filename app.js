@@ -26,6 +26,7 @@ app.use(express.json());
 
 // ROUTER
 app.use("/api/v1/user", require("./routers/userRouter"));
+app.use("/api/v1/courses", require("./routers/coursesRouter"));
 
 // CONNECTION
 connection

@@ -50,7 +50,7 @@ const auth = asyncHandler(async (req, res, next) => {
 // Optional: Middleware to check for specific roles
 const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
+    if (!req.user || !roles.includes(req.user.is_active)) {
       return res.status(403).json({
         success: false,
         message: "Not authorized to access this route",
