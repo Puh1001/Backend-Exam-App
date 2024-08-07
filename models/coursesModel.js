@@ -4,14 +4,14 @@ const createCourses = async (
   conn,
   courseName,
   description,
+  author_id,
   price,
   isPublished,
-  subject_id,
-  user_id
+  subject_id
 ) => {
   const [result] = await conn.execute(
-    "INSERT INTO courses (course_name, description, price, is_published, subject_id, user_id) VALUES (?, ?, ?, ?, ?, ?)",
-    [courseName, description, price, isPublished, subject_id, user_id]
+    "INSERT INTO courses (course_name, description, author_id, price, is_published, subject_id) VALUES (?, ?, ?, ?, ?, ?)",
+    [courseName, description, author_id, price, isPublished, subject_id]
   );
   return result.insertId;
 };
@@ -34,14 +34,14 @@ const updateCourse = async (
   id,
   courseName,
   description,
+  author_id,
   price,
   isPublished,
-  subject_id,
-  user_id
+  subject_id
 ) => {
   const [result] = await conn.execute(
-    "UPDATE courses SET course_name = ?, description = ?, price = ?, is_published = ?, subject_id = ?, user_id = ? WHERE course_id = ?",
-    [courseName, description, price, isPublished, subject_id, user_id, id]
+    "UPDATE courses SET course_name = ?, description = ?, author_id = ? , price = ?, is_published = ?, subject_id = ?  WHERE course_id = ?",
+    [courseName, description, author_id, price, isPublished, subject_id, id]
   );
   return result.affectedRows;
 };

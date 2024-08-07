@@ -4,19 +4,19 @@ const addCourse = async (
   conn,
   courseName,
   description,
+  author_id,
   price,
   isPublished,
-  subject_id,
-  user_id
+  subject_id
 ) => {
   return await coursesModel.createCourses(
     conn,
     courseName,
     description,
+    author_id,
     price,
     isPublished,
-    subject_id,
-    user_id
+    subject_id
   );
 };
 
@@ -33,20 +33,20 @@ const updateCourse = async (
   id,
   courseName,
   description,
+  author_id,
   price,
   isPublished,
-  subject_id,
-  user_id
+  subject_id
 ) => {
   return await coursesModel.updateCourse(
     conn,
     id,
     courseName,
     description,
+    author_id,
     price,
     isPublished,
-    subject_id,
-    user_id
+    subject_id
   );
 };
 

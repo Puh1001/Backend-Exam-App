@@ -7,15 +7,21 @@ const createCourse = expressAsyncHandler(async (req, res) => {
 
   try {
     await conn.beginTransaction();
-    const { courseName, description, price, isPublished, subject_id, user_id } =
-      req.body;
+    const {
+      courseName,
+      description,
+      author_id,
+      price,
+      isPublished,
+      subject_id,
+    } = req.body;
     if (
       !courseName ||
       !description ||
       !price ||
       !isPublished ||
       !subject_id ||
-      !user_id
+      !author_id
     ) {
       return res.status(400).json({
         success: false,
@@ -27,10 +33,10 @@ const createCourse = expressAsyncHandler(async (req, res) => {
       conn,
       courseName,
       description,
+      author_id,
       price,
       isPublished,
-      subject_id,
-      user_id
+      subject_id
     );
     await conn.commit();
     res.status(201).json({
@@ -91,8 +97,14 @@ const updateCourse = expressAsyncHandler(async (req, res) => {
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
-    const { courseName, description, price, isPublished, subject_id, user_id } =
-      req.body;
+    const {
+      courseName,
+      description,
+      author_id,
+      price,
+      isPublished,
+      subject_id,
+    } = req.body;
     const courseId = req.params.id;
 
     await coursesService.updateCourse(
@@ -100,10 +112,10 @@ const updateCourse = expressAsyncHandler(async (req, res) => {
       courseId,
       courseName,
       description,
+      author_id,
       price,
       isPublished,
-      subject_id,
-      user_id
+      subject_id
     );
     await conn.commit();
     res.status(200).json({
