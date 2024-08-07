@@ -14,12 +14,7 @@ router.post(
 );
 
 // Read Courses
-router.get(
-  "/getAllCourses",
-  middlewares.auth,
-  middlewares.authorize("student"),
-  coursesController.getAllCourses
-);
+router.get("/getAllCourses", middlewares.auth, coursesController.getAllCourses);
 router.get("/getCourse/:id", middlewares.auth, coursesController.getCourseById);
 
 // Update Course
