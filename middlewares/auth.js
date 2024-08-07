@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
-const db = require("../configs/db");
-
+const userModel = require("../models/userModel");
 const auth = asyncHandler(async (req, res, next) => {
   let token;
 
@@ -26,17 +25,13 @@ const auth = asyncHandler(async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // Get user from the token
-    const [rows] = await db.execute(
-      "SELECT user_id, username, email, is_active FROM users WHERE user_id = ?",
-      [decoded.id]
-    );
+    const user = await userModel.findUSerById(decoded.id);
 
-    if (rows.length === 0) {
+    if (user.length === 0) {
       res.status(401);
       throw new Error("Not authorized, user not found");
     }
-
-    req.user = rows[0];
+    req.user = user;
     next();
   } catch (error) {
     console.error("Auth error:", error);
@@ -50,7 +45,7 @@ const auth = asyncHandler(async (req, res, next) => {
 // Optional: Middleware to check for specific roles
 const authorize = (...roles) => {
   return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.is_active)) {
+    if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: "Not authorized to access this route",

@@ -9,19 +9,24 @@ const router = express.Router();
 router.post(
   "/addCourse",
   middlewares.auth,
-  middlewares.authorize(1),
+  middlewares.authorize("admin"),
   coursesController.createCourse
 );
 
 // Read Courses
-router.get("/getAllCourses", middlewares.auth, coursesController.getAllCourses);
+router.get(
+  "/getAllCourses",
+  middlewares.auth,
+  middlewares.authorize("student"),
+  coursesController.getAllCourses
+);
 router.get("/getCourse/:id", middlewares.auth, coursesController.getCourseById);
 
 // Update Course
 router.put(
   "/updateCourse/:id",
   middlewares.auth,
-  middlewares.authorize(1),
+  middlewares.authorize("admin"),
   coursesController.updateCourse
 );
 
@@ -29,7 +34,7 @@ router.put(
 router.delete(
   "/deleteCourse/:id",
   middlewares.auth,
-  middlewares.authorize(1),
+  middlewares.authorize("admin"),
   coursesController.deleteCourse
 );
 

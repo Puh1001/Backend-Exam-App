@@ -1,18 +1,27 @@
 const db = require("../configs/db");
 
 const findUserByUsername = async (username) => {
-  const [rows] = await db.execute(
-    "SELECT * FROM `users` WHERE `username` = ?",
-    [username]
-  );
-  return rows[0];
+  try {
+    const [rows] = await db.execute(
+      "SELECT * FROM `users` WHERE `username` = ?",
+      [username]
+    );
+    return rows[0];
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const findUSerById = async (userId) => {
   try {
-    console.log(userId);
     const [rows] = await db.execute(
-      "SELECT user_id, username, email, fullname, phone FROM users WHERE user_id = ?",
+      `
+      SELECT u.user_id, u.username, u.email, u.fullname, u.phone, r.role_name as role
+      FROM users u
+      LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.role_id
+      WHERE u.user_id = ?
+    `,
       [userId]
     );
     return rows[0];
