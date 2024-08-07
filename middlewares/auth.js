@@ -11,14 +11,12 @@ const auth = asyncHandler(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
-  // If no Bearer token, check for token in cookie
-  else if (req.cookies.accessToken) {
-    token = req.cookies.accessToken;
-  }
 
   if (!token) {
-    res.status(401);
-    throw new Error("Not authorized, no token");
+    return res.status(401).json({
+      success: false,
+      message: "Not authorized, no token",
+    });
   }
 
   try {
@@ -26,16 +24,17 @@ const auth = asyncHandler(async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // Get user from the token
     const user = await userModel.findUSerById(decoded.id);
-
     if (user.length === 0) {
-      res.status(401);
-      throw new Error("Not authorized, user not found");
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, user not found",
+      });
     }
     req.user = user;
     next();
   } catch (error) {
-    console.error("Auth error:", error);
-    res.status(401).json({
+    console.log(error);
+    return res.status(401).json({
       success: false,
       message: "Not authorized, token failed",
     });
