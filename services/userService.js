@@ -23,6 +23,22 @@ const registerUser = async (conn, username, password, email) => {
   await userModel.assignRoleToUser(conn, newUserId, defaultRoleId);
 };
 
+const checkUserExistence = async (conn, username, email) => {
+  const [existingUsers] = await conn.query(
+    "SELECT * FROM users WHERE username = ? OR email = ?",
+    [username, email]
+  );
+
+  if (existingUsers.length > 0) {
+    if (existingUsers[0].username === username) {
+      throw new Error("Username already exists");
+    }
+    if (existingUsers[0].email === email) {
+      throw new Error("Email already exists");
+    }
+  }
+};
+
 class UserNotFoundError extends Error {
   constructor(message = "User not found") {
     super(message);
@@ -83,6 +99,7 @@ module.exports = {
   loginUser,
   refreshUserToken,
   getUserDataById,
+  checkUserExistence,
   UserNotFoundError,
   InvalidCredentialsError,
 };

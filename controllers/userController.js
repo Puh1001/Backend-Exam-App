@@ -37,6 +37,16 @@ const registerUserController = asyncHandler(async (req, res) => {
       });
     }
 
+    // Kiểm tra xem username hoặc email đã tồn tại chưa
+    try {
+      await userService.checkUserExistence(conn, username, email);
+    } catch (error) {
+      return res.status(409).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
     await userService.registerUser(conn, username, password, email);
     await conn.commit();
 
