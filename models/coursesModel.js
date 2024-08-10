@@ -1,17 +1,16 @@
 db = require("../configs/db");
 
-const createCourses = async (
+const createCourse = async (
   conn,
   courseName,
-  description,
-  author_id,
+  author,
   price,
-  isPublished,
-  subject_id
+  thumbnail,
+  subjectId
 ) => {
   const [result] = await conn.execute(
-    "INSERT INTO courses (course_name, description, author_id, price, is_published, subject_id) VALUES (?, ?, ?, ?, ?, ?)",
-    [courseName, description, author_id, price, isPublished, subject_id]
+    "INSERT INTO courses (course_name, author, price, course_thuml, subject_id) VALUES (?, ?, ?, ?, ?)",
+    [courseName, author, price, thumbnail, subjectId]
   );
   return result.insertId;
 };
@@ -55,7 +54,7 @@ const deleteCourse = async (conn, id) => {
 };
 
 module.exports = {
-  createCourses,
+  createCourse,
   getAllCourses,
   getCourseById,
   updateCourse,

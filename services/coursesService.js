@@ -1,22 +1,31 @@
 const coursesModel = require("../models/coursesModel");
 
+const getSubjectIdByName = async (conn, name) => {
+  const [rows] = await conn.execute(
+    "SELECT subject_id FROM subjects WHERE subject_name = ?",
+    [name]
+  );
+  return rows[0] ? rows[0].subject_id : null;
+};
+
 const addCourse = async (
   conn,
   courseName,
-  description,
-  author_id,
+  author,
   price,
-  isPublished,
-  subject_id
+  thumbnail,
+  subject
 ) => {
-  return await coursesModel.createCourses(
+  // const authorId = await getUserIdByName(conn, author);
+  const subjectId = await getSubjectIdByName(conn, subject);
+
+  return await coursesModel.createCourse(
     conn,
     courseName,
-    description,
-    author_id,
+    author,
     price,
-    isPublished,
-    subject_id
+    thumbnail,
+    subjectId
   );
 };
 
