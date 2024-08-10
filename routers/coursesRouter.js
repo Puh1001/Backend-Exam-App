@@ -8,8 +8,8 @@ const router = express.Router();
 // Add Coursses
 router.post(
   "/addCourse",
-  // middlewares.auth,
-  // middlewares.authorize("admin"),
+  middlewares.auth,
+  middlewares.authorize("admin"),
   coursesController.createCourse
 );
 
