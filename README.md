@@ -1,6 +1,6 @@
 # Backend-Exam-App 🐣
 
-This is the backend of a review website written in Express.js and MySQL.
+This is the backend of a exam website written in Express.js and MySQL.
 
 # How to use
 
