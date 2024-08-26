@@ -16,7 +16,6 @@ const addCourse = async (
   thumbnail,
   subject
 ) => {
-  // const authorId = await getUserIdByName(conn, author);
   const subjectId = await getSubjectIdByName(conn, subject);
 
   return await coursesModel.createCourse(
@@ -59,8 +58,8 @@ const updateCourse = async (
   );
 };
 
-const deleteCourse = async (conn, id) => {
-  return await coursesModel.deleteCourse(conn, id);
+const deleteCourse = async (conn, courseId) => {
+  return await coursesModel.deleteCourseById(conn, courseId);
 };
 
 module.exports = {

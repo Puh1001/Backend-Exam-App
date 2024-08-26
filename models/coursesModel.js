@@ -1,4 +1,8 @@
 db = require("../configs/db");
+const answersModel = require("./answersModel");
+const questionsModel = require("./questionsModel");
+const lessionsModel = require("./lessionsModel");
+const chapersModel = require("./chapersModel");
 
 const createCourse = async (
   conn,
@@ -16,16 +20,27 @@ const createCourse = async (
 };
 
 const getAllCourses = async () => {
-  const [rows] = await db.execute("SELECT * FROM courses");
+  const [rows] = await db.execute(`
+    SELECT c.*, s.subject_name 
+    FROM courses c
+    LEFT JOIN subjects s ON c.subject_id = s.subject_id
+    ORDER BY c.course_id DESC
+  `);
   return rows;
 };
 
 const getCourseById = async (id) => {
   const [rows] = await db.execute(
-    "SELECT * FROM courses WHERE course_id  = ?",
+    `
+    SELECT c.*, s.subject_name 
+    FROM courses c
+    LEFT JOIN subjects s ON c.subject_id = s.subject_id
+    WHERE c.course_id = ?
+  `,
     [id]
   );
-  return rows[0];
+
+  return rows[0]; // Return the first (and should be only) result
 };
 
 const updateCourse = async (
@@ -33,22 +48,40 @@ const updateCourse = async (
   id,
   courseName,
   description,
-  author_id,
+  authorId,
   price,
-  isPublished,
-  subject_id
+  thumbnail,
+  subjectId,
+  isPublished
 ) => {
   const [result] = await conn.execute(
-    "UPDATE courses SET course_name = ?, description = ?, author_id = ? , price = ?, is_published = ?, subject_id = ?  WHERE course_id = ?",
-    [courseName, description, author_id, price, isPublished, subject_id, id]
+    `UPDATE courses 
+     SET course_name = ?, description = ?, author_id = ?, 
+         price = ?, course_thuml = ?, subject_id = ?, is_published = ?
+     WHERE course_id = ?`,
+    [
+      courseName,
+      description,
+      authorId,
+      price,
+      thumbnail,
+      subjectId,
+      isPublished,
+      id,
+    ]
   );
   return result.affectedRows;
 };
 
-const deleteCourse = async (conn, id) => {
+const deleteCourseById = async (conn, courseId) => {
+  await answersModel.deleteAnswersByCourseId(conn, courseId);
+  await questionsModel.deleteQuestionsByCourseId(conn, courseId);
+  await lessionsModel.deleteLessonsByCourseId(conn, courseId);
+  await chapersModel.deleteChaptersByCourseId(conn, courseId);
+
   const [result] = await conn.execute(
-    "DELETE FROM courses WHERE course_id = ?",
-    [id]
+    `DELETE FROM courses WHERE course_id = ?`,
+    [courseId]
   );
   return result.affectedRows;
 };
@@ -58,5 +91,5 @@ module.exports = {
   getAllCourses,
   getCourseById,
   updateCourse,
-  deleteCourse,
+  deleteCourseById,
 };

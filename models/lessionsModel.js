@@ -14,7 +14,17 @@ const updateVideoLesson = async (conn, lessonId, videoUrl) => {
   return result.affectedRows;
 };
 
+const deleteLessonsByCourseId = async (conn, courseId) => {
+  await conn.execute(
+    `DELETE l FROM lessons l
+     INNER JOIN chapters c ON l.chapter_id = c.chapter_id
+     WHERE c.course_id = ?`,
+    [courseId]
+  );
+};
+
 module.exports = {
   createLesson,
   updateVideoLesson,
+  deleteLessonsByCourseId,
 };

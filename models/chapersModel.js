@@ -6,15 +6,11 @@ const createChapter = async (conn, courseId, chapterName, order) => {
   return result.insertId;
 };
 
-const deleteChapter = async (conn, id) => {
-  const [result] = await conn.execute(
-    "DELETE FROM chapters WHERE course_id = ?",
-    [id]
-  );
-  return result.affectedRows;
+const deleteChaptersByCourseId = async (conn, courseId) => {
+  await conn.execute(`DELETE FROM chapters WHERE course_id = ?`, [courseId]);
 };
 
 module.exports = {
   createChapter,
-  deleteChapter,
+  deleteChaptersByCourseId,
 };
