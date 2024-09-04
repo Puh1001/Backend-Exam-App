@@ -55,7 +55,6 @@ class InvalidCredentialsError extends Error {
 
 const loginUser = async (conn, username, password) => {
   const user = await userModel.findUserByUsername(username);
-
   if (!user) {
     throw new UserNotFoundError();
   }
