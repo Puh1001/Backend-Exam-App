@@ -6,6 +6,22 @@ const createAnswer = async (conn, questionId, content, answerLetter) => {
   return result.insertId;
 };
 
+const getAnswersByQuestionId = async (conn, questionId) => {
+  const [rows] = await conn.execute(
+    "SELECT * FROM answers WHERE question_id = ?",
+    [questionId]
+  );
+  return rows;
+};
+
+const updateAnswer = async (conn, answerId, content, answerLetter) => {
+  const [result] = await conn.execute(
+    "UPDATE answers SET answer_content = ?, answer_letter = ? WHERE answer_id = ?",
+    [content, answerLetter, answerId]
+  );
+  return result.affectedRows;
+};
+
 const deleteAnswersByCourseId = async (conn, courseId) => {
   await conn.execute(
     `DELETE a FROM answers a
@@ -19,5 +35,7 @@ const deleteAnswersByCourseId = async (conn, courseId) => {
 
 module.exports = {
   createAnswer,
+  getAnswersByQuestionId,
+  updateAnswer,
   deleteAnswersByCourseId,
 };

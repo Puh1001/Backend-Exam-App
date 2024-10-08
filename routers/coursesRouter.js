@@ -28,8 +28,8 @@ router.put(
 // Delete Course
 router.delete(
   "/deleteCourse/:id",
-  // middlewares.auth,
-  // middlewares.authorize("admin"),
+  middlewares.auth,
+  middlewares.authorize("admin"),
   coursesController.deleteCourse
 );
 

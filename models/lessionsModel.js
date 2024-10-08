@@ -6,10 +6,18 @@ const createLesson = async (conn, chapterId, type, content, order) => {
   return result.insertId;
 };
 
-const updateVideoLesson = async (conn, lessonId, videoUrl) => {
+const getLessonsByChapterId = async (conn, chapterId) => {
+  const [rows] = await conn.execute(
+    "SELECT * FROM lessons WHERE chapter_id = ? ORDER BY `order`",
+    [chapterId]
+  );
+  return rows;
+};
+
+const updateLesson = async (conn, lessonId, type, content, order) => {
   const [result] = await conn.execute(
-    "UPDATE lessons SET video_url = ? WHERE lesson_id = ?",
-    [videoUrl, lessonId]
+    "UPDATE lessons SET type = ?, content = ?, `order` = ? WHERE lesson_id = ?",
+    [type, content, order, lessonId]
   );
   return result.affectedRows;
 };
@@ -25,6 +33,7 @@ const deleteLessonsByCourseId = async (conn, courseId) => {
 
 module.exports = {
   createLesson,
-  updateVideoLesson,
+  getLessonsByChapterId,
+  updateLesson,
   deleteLessonsByCourseId,
 };

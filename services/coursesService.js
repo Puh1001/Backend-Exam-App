@@ -1,4 +1,8 @@
 const coursesModel = require("../models/coursesModel");
+const chaptersModel = require("../models/chapersModel");
+const lessonsModel = require("../models/lessionsModel");
+const questionsModel = require("../models/questionsModel");
+const answersModel = require("../models/answersModel");
 
 const getSubjectIdByName = async (conn, name) => {
   const [rows] = await conn.execute(
@@ -32,8 +36,33 @@ const getAllCourses = async () => {
   return await coursesModel.getAllCourses();
 };
 
-const getCourseById = async (id) => {
-  return await coursesModel.getCourseById(id);
+const getCourseById = async (conn, id) => {
+  const course = await coursesModel.getCourseById(id);
+  if (course) {
+    course.chapters = await chaptersModel.getChaptersByCourseId(
+      conn,
+      course.course_id
+    );
+    for (const chapter of course.chapters) {
+      chapter.lessons = await lessonsModel.getLessonsByChapterId(
+        conn,
+        chapter.chapter_id
+      );
+      for (const lesson of chapter.lessons) {
+        lesson.questions = await questionsModel.getQuestionsByLessonId(
+          conn,
+          lesson.lesson_id
+        );
+        for (const question of lesson.questions) {
+          question.answers = await answersModel.getAnswersByQuestionId(
+            conn,
+            question.question_id
+          );
+        }
+      }
+    }
+  }
+  return course;
 };
 
 const updateCourse = async (
