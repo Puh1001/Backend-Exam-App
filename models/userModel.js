@@ -3,7 +3,13 @@ const db = require("../configs/db");
 const findUserByUsername = async (username) => {
   try {
     const [rows] = await db.execute(
-      "SELECT * FROM `users` WHERE `username` = ?",
+      `
+      SELECT u.user_id, u.username, u.password, u.email, u.fullname, u.phone, r.role_name as role
+      FROM users u
+      LEFT JOIN user_roles ur ON u.user_id = ur.user_id
+      LEFT JOIN roles r ON ur.role_id = r.role_id
+      WHERE u.username = ?
+    `,
       [username]
     );
     return rows[0];

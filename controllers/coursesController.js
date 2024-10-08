@@ -1,19 +1,12 @@
 const expressAsyncHandler = require("express-async-handler");
-const coursesService = require("../services/coursesService");
-const chaptersService = require("../services/chaptersService");
-const lessionsService = require("../services/lessionsService");
-const questionsService = require("../services/questionsService");
 const db = require("../configs/db");
+const coursesService = require("../services/coursesService");
 
 const createCourse = expressAsyncHandler(async (req, res) => {
+  const { courseName, author, price, thumbnail, subject } = req.body;
   const conn = await db.getConnection();
-
   try {
     await conn.beginTransaction();
-    const { courseName, chapters, author, price, thumbnail, subject } =
-      req.body;
-
-    // Insert course
     const courseId = await coursesService.addCourse(
       conn,
       courseName,
@@ -22,55 +15,17 @@ const createCourse = expressAsyncHandler(async (req, res) => {
       thumbnail,
       subject
     );
-
-    // Insert chapters and lessons
-    for (let i = 0; i < chapters.length; i++) {
-      const chapter = chapters[i];
-      const chapterId = await chaptersService.addChapter(
-        conn,
-        courseId,
-        chapter.name,
-        i + 1
-      );
-
-      for (let j = 0; j < chapter.lessons.length; j++) {
-        const lesson = chapter.lessons[j];
-        const lessonId = await lessionsService.addLesson(
-          conn,
-          chapterId,
-          lesson.type,
-          lesson.content,
-          j + 1
-        );
-
-        if (lesson.type === "quiz") {
-          await questionsService.addQuizQuestion(
-            conn,
-            lessonId,
-            lesson.content,
-            lesson.options,
-            lesson.correctAnswer
-          );
-        } else if (lesson.type === "video") {
-          await lessionsService.updateVideoLesson(
-            conn,
-            lessonId,
-            lesson.content
-          );
-        }
-      }
-    }
-
     await conn.commit();
     res.status(201).json({
       success: true,
-      message: "New course added successfully",
+      message: "Course created successfully",
+      data: { courseId },
     });
   } catch (err) {
     await conn.rollback();
     res.status(500).json({
       success: false,
-      message: "An error occurred in creating the course!",
+      message: "An error occurred while creating the course!",
     });
     console.log(err);
   } finally {
@@ -79,13 +34,17 @@ const createCourse = expressAsyncHandler(async (req, res) => {
 });
 
 const getAllCourses = expressAsyncHandler(async (req, res) => {
+  const conn = await db.getConnection();
   try {
-    const courses = await coursesService.getAllCourses();
+    await conn.beginTransaction();
+    const courses = await coursesService.getAllCourses(conn);
+    await conn.commit();
     res.status(200).json({
       success: true,
       data: courses,
     });
   } catch (err) {
+    await conn.rollback();
     res.status(500).json({
       success: false,
       message: "An error occurred while fetching courses!",
@@ -95,44 +54,42 @@ const getAllCourses = expressAsyncHandler(async (req, res) => {
 });
 
 const getCourseById = expressAsyncHandler(async (req, res) => {
+  const conn = await db.getConnection();
   try {
-    const course = await coursesService.getCourseById(req.params.id);
+    await conn.beginTransaction();
+    const course = await coursesService.getCourseById(conn, req.params.id);
     if (!course) {
       return res.status(404).json({
         success: false,
         message: "Course not found",
       });
     }
+    await conn.commit();
     res.status(200).json({
       success: true,
       data: course,
     });
   } catch (err) {
+    await conn.rollback();
     res.status(500).json({
       success: false,
       message: "An error occurred while fetching the course!",
     });
     console.log(err);
+  } finally {
+    conn.release();
   }
 });
 
 const updateCourse = expressAsyncHandler(async (req, res) => {
+  const { courseName, description, author_id, price, isPublished, subject_id } =
+    req.body;
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
-    const {
-      courseName,
-      description,
-      author_id,
-      price,
-      isPublished,
-      subject_id,
-    } = req.body;
-    const courseId = req.params.id;
-
     await coursesService.updateCourse(
       conn,
-      courseId,
+      req.params.id,
       courseName,
       description,
       author_id,
