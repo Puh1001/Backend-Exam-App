@@ -1,20 +1,18 @@
 const db = require("../configs/db");
 const lessionsModel = require("../models/lessionsModel");
 
-const addLesson = async (chapterId, type, content, order) => {
-  const conn = await db.getConnection();
-  try {
-    const lessonId = await lessionsModel.createLesson(
-      conn,
-      chapterId,
-      type,
-      content,
-      order
-    );
-    return lessonId;
-  } finally {
-    conn.release();
-  }
+const addLesson = async (conn, chapterId, type, content, order) => {
+  return await lessionsModel.createLesson(
+    conn,
+    chapterId,
+    type,
+    content,
+    order
+  );
+};
+
+const updateVideoLesson = async (conn, lessonId, videoUrl) => {
+  return await lessionsModel.updateVideoLesson(conn, lessonId, videoUrl);
 };
 
 const getLessonsByChapterId = async (chapterId) => {
@@ -55,6 +53,7 @@ const deleteLessonsByCourseId = async (courseId) => {
 module.exports = {
   addLesson,
   getLessonsByChapterId,
+  updateVideoLesson,
   updateLesson,
   deleteLessonsByCourseId,
 };

@@ -6,6 +6,14 @@ const createLesson = async (conn, chapterId, type, content, order) => {
   return result.insertId;
 };
 
+const updateVideoLesson = async (conn, lessonId, videoUrl) => {
+  const [result] = await conn.execute(
+    "UPDATE lessons SET video_url = ? WHERE lesson_id = ?",
+    [videoUrl, lessonId]
+  );
+  return result.affectedRows;
+};
+
 const getLessonsByChapterId = async (conn, chapterId) => {
   const [rows] = await conn.execute(
     "SELECT * FROM lessons WHERE chapter_id = ? ORDER BY `order`",
@@ -33,6 +41,7 @@ const deleteLessonsByCourseId = async (conn, courseId) => {
 
 module.exports = {
   createLesson,
+  updateVideoLesson,
   getLessonsByChapterId,
   updateLesson,
   deleteLessonsByCourseId,

@@ -1,19 +1,8 @@
 const db = require("../configs/db");
 const chaptersModel = require("../models/chapersModel");
 
-const createChapter = async (courseId, chapterName, order) => {
-  const conn = await db.getConnection();
-  try {
-    const chapterId = await chaptersModel.createChapter(
-      conn,
-      courseId,
-      chapterName,
-      order
-    );
-    return chapterId;
-  } finally {
-    conn.release();
-  }
+const createChapter = async (conn, courseId, chapterName, order) => {
+  return await chaptersModel.createChapter(conn, courseId, chapterName, order);
 };
 
 const getChaptersByCourseId = async (courseId) => {
