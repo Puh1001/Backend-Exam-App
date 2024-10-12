@@ -28,62 +28,52 @@ const addQuizQuestion = async (
   return questionId;
 };
 
-const createQuestion = async (lessonId, content, correctAnswer) => {
-  const conn = await db.getConnection();
-  try {
-    const questionId = await questionsModel.createQuestion(
-      conn,
-      lessonId,
-      content,
-      correctAnswer
-    );
-    return questionId;
-  } finally {
-    conn.release();
-  }
+const createQuestion = async (conn, lessonId, content, correctAnswer) => {
+  const questionId = await questionsModel.createQuestion(
+    conn,
+    lessonId,
+    content,
+    correctAnswer
+  );
+  return questionId;
 };
 
-const getQuestionsByLessonId = async (lessonId) => {
-  const conn = await db.getConnection();
-  try {
-    const questions = await questionsModel.getQuestionsByLessonId(
-      conn,
-      lessonId
-    );
-    return questions;
-  } finally {
-    conn.release();
-  }
+const getQuestionsByLessonId = async (conn, lessonId) => {
+  const questions = await questionsModel.getQuestionsByLessonId(conn, lessonId);
+  return questions;
 };
 
-const updateQuestion = async (questionId, content, correctAnswer) => {
-  const conn = await db.getConnection();
-  try {
-    const affectedRows = await questionsModel.updateQuestion(
-      conn,
-      questionId,
-      content,
-      correctAnswer
-    );
-    return affectedRows;
-  } finally {
-    conn.release();
-  }
+const updateQuestion = async (conn, questionId, content, correctAnswer) => {
+  const affectedRows = await questionsModel.updateQuestion(
+    conn,
+    questionId,
+    content,
+    correctAnswer
+  );
+  return affectedRows;
 };
 
-const deleteQuestionsByCourseId = async (courseId) => {
-  const conn = await db.getConnection();
-  try {
-    await questionsModel.deleteQuestionsByCourseId(conn, courseId);
-  } finally {
-    conn.release();
-  }
+const updateQuizQuestion = async (
+  conn,
+  questionId,
+  content,
+  options,
+  correctAnswer
+) => {
+  await questionsModel.updateQuestion(conn, questionId, content, correctAnswer);
+
+  return questionId;
+};
+
+const deleteQuestionsByCourseId = async (conn, courseId) => {
+  await questionsModel.deleteQuestionsByCourseId(conn, courseId);
 };
 
 module.exports = {
   addQuizQuestion,
   createQuestion,
   getQuestionsByLessonId,
+  updateQuizQuestion,
   updateQuestion,
   deleteQuestionsByCourseId,
 };

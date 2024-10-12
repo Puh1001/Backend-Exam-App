@@ -16,38 +16,23 @@ const updateVideoLesson = async (conn, lessonId, videoUrl) => {
 };
 
 const getLessonsByChapterId = async (chapterId) => {
-  const conn = await db.getConnection();
-  try {
-    const lessons = await lessionsModel.getLessonsByChapterId(conn, chapterId);
-    return lessons;
-  } finally {
-    conn.release();
-  }
+  const lessons = await lessionsModel.getLessonsByChapterId(conn, chapterId);
+  return lessons;
 };
 
-const updateLesson = async (lessonId, type, content, order) => {
-  const conn = await db.getConnection();
-  try {
-    const affectedRows = await lessionsModel.updateLesson(
-      conn,
-      lessonId,
-      type,
-      content,
-      order
-    );
-    return affectedRows;
-  } finally {
-    conn.release();
-  }
+const updateLesson = async (conn, lessonId, type, content, order) => {
+  const affectedRows = await lessionsModel.updateLesson(
+    conn,
+    lessonId,
+    type,
+    content,
+    order
+  );
+  return affectedRows;
 };
 
 const deleteLessonsByCourseId = async (courseId) => {
-  const conn = await db.getConnection();
-  try {
-    await lessionsModel.deleteLessonsByCourseId(conn, courseId);
-  } finally {
-    conn.release();
-  }
+  await lessionsModel.deleteLessonsByCourseId(conn, courseId);
 };
 
 module.exports = {

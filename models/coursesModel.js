@@ -42,15 +42,14 @@ const updateCourse = async (
   conn,
   id,
   courseName,
-  description,
-  author_id,
+  author,
   price,
-  isPublished,
-  subject_id
+  thumbnail,
+  subjectId
 ) => {
   const [result] = await conn.execute(
-    "UPDATE courses SET course_name = ?, description = ?, author_id = ?, price = ?, is_published = ?, subject_id = ? WHERE course_id = ?",
-    [courseName, description, author_id, price, isPublished, subject_id, id]
+    "UPDATE courses SET course_name = ?, author = ?, price = ?, course_thuml = ?, subject_id = ? WHERE course_id = ?",
+    [courseName, author, price, thumbnail, subjectId, id]
   );
   return result.affectedRows;
 };

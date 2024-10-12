@@ -15,11 +15,10 @@ const getChaptersByCourseId = async (conn, courseId) => {
 };
 
 const updateChapter = async (conn, chapterId, chapterName, order) => {
-  await conn.execute("UPDATE chapters SET name = ?, `order` = ? WHERE id = ?", [
-    chapterName,
-    order,
-    chapterId,
-  ]);
+  await conn.execute(
+    "UPDATE chapters SET name = ?, `order` = ? WHERE chapter_id = ?",
+    [chapterName, order, chapterId]
+  );
 };
 
 const deleteChaptersByCourseId = async (conn, courseId) => {

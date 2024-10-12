@@ -14,10 +14,10 @@ const getAnswersByQuestionId = async (conn, questionId) => {
   return rows;
 };
 
-const updateAnswer = async (conn, answerId, content, answerLetter) => {
+const updateAnswer = async (conn, answerId, answerContent, answerLetter) => {
   const [result] = await conn.execute(
     "UPDATE answers SET answer_content = ?, answer_letter = ? WHERE answer_id = ?",
-    [content, answerLetter, answerId]
+    [answerContent, answerLetter, answerId]
   );
   return result.affectedRows;
 };

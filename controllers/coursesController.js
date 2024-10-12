@@ -3,6 +3,7 @@ const coursesService = require("../services/coursesService");
 const chaptersService = require("../services/chaptersService");
 const lessionsService = require("../services/lessionsService");
 const questionsService = require("../services/questionsService");
+const answersServices = require("../services/answersService");
 const db = require("../configs/db");
 
 const createCourse = expressAsyncHandler(async (req, res) => {
@@ -127,21 +128,89 @@ const getCourseById = expressAsyncHandler(async (req, res) => {
 });
 
 const updateCourse = expressAsyncHandler(async (req, res) => {
-  const { courseName, description, author_id, price, isPublished, subject_id } =
-    req.body;
   const conn = await db.getConnection();
   try {
     await conn.beginTransaction();
+    const courseId = req.params.id;
+    const {
+      course_name: courseName,
+      author,
+      price,
+      course_thuml: thumbnail,
+      subject_id: subject,
+      chapters,
+    } = req.body.data;
+
+    // Update course
     await coursesService.updateCourse(
       conn,
-      req.params.id,
+      courseId,
       courseName,
-      description,
-      author_id,
+      author,
       price,
-      isPublished,
-      subject_id
+      thumbnail,
+      subject
     );
+    for (const chapter of chapters) {
+      const { chapter_id: chapterId, name, order, lessons } = chapter;
+      await chaptersService.updateChapter(conn, chapterId, name, order);
+
+      // Update lessons
+      for (const lesson of lessons) {
+        const {
+          lesson_id: lessonId,
+          type,
+          content,
+          order,
+          options,
+          correctAnswer,
+          questions,
+        } = lesson;
+        await lessionsService.updateLesson(
+          conn,
+          lessonId,
+          type,
+          content,
+          order
+        );
+        if (type === "quiz") {
+          for (const question of questions) {
+            const {
+              question_id: questionId,
+              question_content: content,
+              image_URL: url,
+              correct_answer: correctAnswer,
+              detail_answer: detailAnswer,
+              answers,
+            } = question;
+            await questionsService.updateQuizQuestion(
+              conn,
+              questionId,
+              content,
+              options,
+              correctAnswer,
+              answers
+            );
+            for (const answer of answers) {
+              const {
+                answer_id: answerId,
+                answer_content: content,
+                answer_letter: letter,
+              } = answer;
+              await answersServices.updateAnswer(
+                conn,
+                answerId,
+                content,
+                letter
+              );
+            }
+          }
+        } else if (type === "video") {
+          await lessionsService.updateVideoLesson(conn, lessonId, content);
+        }
+      }
+    }
+
     await conn.commit();
     res.status(200).json({
       success: true,

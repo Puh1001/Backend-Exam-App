@@ -67,23 +67,22 @@ const getCourseById = async (conn, id) => {
 
 const updateCourse = async (
   conn,
-  id,
+  courseId,
   courseName,
-  description,
-  author_id,
+  author,
   price,
-  isPublished,
-  subject_id
+  thumbnail,
+  subject
 ) => {
+  const subjectId = await getSubjectIdByName(conn, subject);
   return await coursesModel.updateCourse(
     conn,
-    id,
+    courseId,
     courseName,
-    description,
-    author_id,
+    author,
     price,
-    isPublished,
-    subject_id
+    thumbnail,
+    subjectId
   );
 };
 
