@@ -6,7 +6,7 @@ const {
   InvalidCredentialsError,
 } = require("../services/userService");
 
-const getUserController = asyncHandler(async (req, res) => {
+const getUser = asyncHandler(async (req, res) => {
   const [data] = await db.query("SELECT * FROM `users`");
 
   if (!data.length) {
@@ -23,11 +23,11 @@ const getUserController = asyncHandler(async (req, res) => {
   });
 });
 
-const registerUserController = asyncHandler(async (req, res) => {
-  const conn = await db.getConnection();
+const registerUser = asyncHandler(async (req, res) => {
+  const connection = await db.getconnectionection();
 
   try {
-    await conn.beginTransaction();
+    await connection.beginTransaction();
     const { username, password, email } = req.body;
 
     if (!username || !password || !email) {
@@ -37,9 +37,9 @@ const registerUserController = asyncHandler(async (req, res) => {
       });
     }
 
-    // Kiểm tra xem username hoặc email đã tồn tại chưa
     try {
-      await userService.checkUserExistence(conn, username, email);
+      const userNameAndEmail = { username, email };
+      await userService.checkUserExistence(connection, userNameAndEmail);
     } catch (error) {
       return res.status(409).json({
         success: false,
@@ -47,30 +47,30 @@ const registerUserController = asyncHandler(async (req, res) => {
       });
     }
 
-    await userService.registerUser(conn, username, password, email);
-    await conn.commit();
+    await userService.registerUser(connection, username, password, email);
+    await connection.commit();
 
     res.status(201).json({
       success: true,
       message: "New user registered successfully",
     });
   } catch (error) {
-    await conn.rollback();
+    await connection.rollback();
     res.status(500).json({
       success: false,
       message: "Error in register user!!",
     });
     console.log(error);
   } finally {
-    conn.release();
+    connection.release();
   }
 });
 
-const loginUserController = asyncHandler(async (req, res) => {
-  const conn = await db.getConnection();
+const loginUser = asyncHandler(async (req, res) => {
+  const connection = await db.getconnectionection();
 
   try {
-    await conn.beginTransaction();
+    await connection.beginTransaction();
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -82,11 +82,11 @@ const loginUserController = asyncHandler(async (req, res) => {
 
     try {
       const { user, accessToken, refreshToken } = await userService.loginUser(
-        conn,
+        connection,
         username,
         password
       );
-      await conn.commit();
+      await connection.commit();
 
       res.cookie("accessToken", accessToken, {
         // httpOnly: true,
@@ -114,7 +114,7 @@ const loginUserController = asyncHandler(async (req, res) => {
         },
       });
     } catch (loginError) {
-      await conn.rollback();
+      await connection.rollback();
 
       if (loginError instanceof UserNotFoundError) {
         return res.status(404).json({
@@ -137,11 +137,11 @@ const loginUserController = asyncHandler(async (req, res) => {
       message: "An error occurred during login",
     });
   } finally {
-    conn.release();
+    connection.release();
   }
 });
 
-const refreshTokenController = asyncHandler(async (req, res) => {
+const refreshToken = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
@@ -173,7 +173,7 @@ const refreshTokenController = asyncHandler(async (req, res) => {
   }
 });
 
-const getUserDataByIdController = asyncHandler(async (req, res) => {
+const getUserDataById = asyncHandler(async (req, res) => {
   const userId = req.params.id;
   try {
     const userData = await userService.getUserDataById(userId);
@@ -197,9 +197,9 @@ const getUserDataByIdController = asyncHandler(async (req, res) => {
 });
 
 module.exports = {
-  getUserController,
-  registerUserController,
-  loginUserController,
-  refreshTokenController,
-  getUserDataByIdController,
+  getUser,
+  registerUser,
+  loginUser,
+  refreshToken,
+  getUserDataById,
 };

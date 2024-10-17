@@ -23,7 +23,8 @@ const registerUser = async (conn, username, password, email) => {
   await userModel.assignRoleToUser(conn, newUserId, defaultRoleId);
 };
 
-const checkUserExistence = async (conn, username, email) => {
+const checkUserExistence = async (conn, userNameAndEmail) => {
+  const {username, email} = userNameAndEmail;
   const [existingUsers] = await conn.query(
     "SELECT * FROM users WHERE username = ? OR email = ?",
     [username, email]

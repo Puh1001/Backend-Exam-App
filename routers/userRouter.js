@@ -1,26 +1,26 @@
 const express = require("express");
 const {
-  getUserController,
-  registerUserController,
-  loginUserController,
-  getUserDataByIdController,
+  getUser,
+  registerUser,
+  loginUser,
+  getUserDataById,
 } = require("../controllers/userController");
 const { auth } = require("../middlewares/auth");
 
 const router = express.Router();
 // test
-router.get("/getUsers", getUserController);
+router.get("/getUsers", getUser);
 
 // Register
-router.post("/registerUser", registerUserController);
+router.post("/registerUser", registerUser);
 
 // Login
-router.post("/login", loginUserController);
+router.post("/login", loginUser);
 
 // get user by id
-router.get("/getUserData/:id", auth, getUserDataByIdController);
+router.get("/getUserData/:id", auth, getUserDataById);
 
-//  Refesh Token Controller
-router.post("/refresh-token", registerUserController);
+//  Refesh Token 
+router.post("/refresh-token", registerUser);
 
 module.exports = router;
